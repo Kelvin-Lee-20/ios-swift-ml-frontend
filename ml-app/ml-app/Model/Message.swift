@@ -9,5 +9,6 @@ import UIKit
 
 struct Message {
     let text: String
+    let image: UIImage
     let isFromServer: Bool
 }

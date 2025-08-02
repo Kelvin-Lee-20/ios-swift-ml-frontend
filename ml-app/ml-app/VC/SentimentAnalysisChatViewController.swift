@@ -9,25 +9,23 @@ import UIKit
 import SnapKit
 import Alamofire
 
-class SentimentAnalysisChatController: UIViewController {
+class SentimentAnalysisChatController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
-    var messages: [Message] = []
-    
+    var messages: [MessageModel] = []
     let tableView = UITableView()
+    
     let toolbarView = UIView()
     let textField = UITextField()
     let sendButton = UIButton(type: .system)
+    let addButton = UIButton(type: .system)
     var containerBottomConstraint: Constraint?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-//        let v = UIView()
-//        v.frame = CGRect.init(x: 0, y: 0, width: 100, height: 100)
-//        v.backgroundColor = UIColor.yellow
-//        self.view.addSubview(v)
-        
-        toolbarView.backgroundColor = .systemGray6
+        addButton.setImage(UIImage(systemName: "plus"), for: .normal)
+        addButton.tintColor = .systemBlue
+        addButton.addTarget(self, action: #selector(openImagePicker), for: .touchUpInside)
         
         textField.placeholder = "Type your message..."
         textField.borderStyle = .roundedRect
@@ -39,7 +37,9 @@ class SentimentAnalysisChatController: UIViewController {
         sendButton.setTitleColor(.systemBlue, for: .normal)
         sendButton.addTarget(self, action: #selector(sendMessageToServer), for: .touchUpInside)
         
+        toolbarView.backgroundColor = .systemGray6
         view.addSubview(toolbarView)
+        toolbarView.addSubview(addButton)
         toolbarView.addSubview(textField)
         toolbarView.addSubview(sendButton)
         
@@ -49,8 +49,15 @@ class SentimentAnalysisChatController: UIViewController {
             make.height.equalTo(60)
         }
         
-        textField.snp.makeConstraints { make in
+        addButton.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(16)
+            make.centerY.equalToSuperview()
+            make.width.height.equalTo(40)
+            make.trailing.equalTo(textField.snp.leading).offset(-8)
+        }
+        
+        textField.snp.makeConstraints { make in
+            make.leading.equalTo(addButton.snp.trailing).offset(8)
             make.top.equalToSuperview().offset(8)
             make.bottom.equalToSuperview().offset(-8)
             make.trailing.equalTo(sendButton.snp.leading).offset(-8)
@@ -62,9 +69,9 @@ class SentimentAnalysisChatController: UIViewController {
             make.width.equalTo(60)
         }
         
+        view.addSubview(tableView)
         tableView.separatorStyle = .none
         tableView.backgroundColor = .clear
-        view.addSubview(tableView)
         tableView.register(MessageBubbleCell.self, forCellReuseIdentifier: MessageBubbleCell.identifier)
         tableView.dataSource = self
         tableView.delegate = self
@@ -118,20 +125,47 @@ class SentimentAnalysisChatController: UIViewController {
 
     }
     
-    private func addBubble(msg:Message) {
+    @objc private func openImagePicker() {
+        let imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
+        imagePicker.sourceType = .photoLibrary
+        imagePicker.allowsEditing = false
+        present(imagePicker, animated: true, completion: nil)
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        picker.dismiss(animated: true, completion: nil)
+        guard let image = info[.originalImage] as? UIImage else {
+            return
+        }
         
+        addBubble(msg: MessageModel(text: "", image: image, isFromServer: false))
+        
+        APIHelper.imageClassification(withImage: image, completion: {
+            
+            msg in
+            
+            self.addBubble(msg: msg)
+            
+        }, fail: {})
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true, completion: nil)
+    }
+ 
+    private func addBubble(msg:MessageModel) {
         messages.append(msg)
         let indexPath = IndexPath(row: messages.count - 1, section: 0)
         tableView.insertRows(at: [indexPath], with: .automatic)
         tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
-        
     }
     
     @objc private func sendMessageToServer() {
-
         guard let text = textField.text, !text.isEmpty else { return }
         
-        addBubble(msg: Message(text: text, isFromServer: false))
+        addBubble(msg: MessageModel(text: text, isFromServer: false))
+        
         textField.text = ""
         
         APIHelper.sentimentAnalysis(withText: text, completion: {
@@ -152,6 +186,7 @@ class SentimentAnalysisChatController: UIViewController {
 }
 
 extension SentimentAnalysisChatController: UITableViewDataSource, UITableViewDelegate {
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return messages.count
     }
@@ -169,4 +204,5 @@ extension SentimentAnalysisChatController: UITableViewDataSource, UITableViewDel
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         return 60
     }
+    
 }
