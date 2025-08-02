@@ -1,6 +1,6 @@
 # ios-swift-ml-frontend
 
-<h3>Sentiment Analysis Chat</h3>
+<h3>Sentiment Analysis And Image Classification Chat</h3>
 
 <h4>Sending message to the chat, server will response the classification of the message.</h4>
 
