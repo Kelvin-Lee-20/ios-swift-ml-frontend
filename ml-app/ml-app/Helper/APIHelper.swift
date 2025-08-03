@@ -48,15 +48,10 @@ class APIHelper: NSObject {
         let url = "\(SERVER_API)api/image-classification"
         
         AF.upload(multipartFormData: { multipartFormData in
-            // Append the image data
             multipartFormData.append(imageData,
                                     withName: "file",
                                     fileName: "image.jpg",
                                     mimeType: "image/jpeg")
-            
-            // If you need to send additional parameters
-            // multipartFormData.append("value".data(using: .utf8)!, withName: "key")
-            
         }, to: url, method: .post)
         .response { response in
             switch response.result {
@@ -65,13 +60,7 @@ class APIHelper: NSObject {
                     let json = JSON(data)
                     let label =  json["predictions"][0]["label"].string!
                     let score =  json["predictions"][0]["probability"].double!
-                    print(json)
-                    
                     completion(MessageModel(text: "\(label) \(score.trimmedToTwoDecimalPlaces())", isFromServer: true))
-                    
-                    // Parse your MessageModel from json here
-                    // let model = MessageModel(from: json)
-                    // completion(model)
                 }
             case .failure(let error):
                 print("error - \(error.localizedDescription)")

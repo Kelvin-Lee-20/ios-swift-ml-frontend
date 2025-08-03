@@ -46,17 +46,11 @@ class MessageBubbleCell: UITableViewCell {
             make.width.lessThanOrEqualToSuperview().multipliedBy(0.75)
         }
         
-        messageImageView.snp.makeConstraints { make in
-//            make.leading.top.trailing.equalToSuperview().inset(12)
-//            make.width.equalTo(120)
-//            make.height.equalTo(120)
-        }
+        messageImageView.snp.makeConstraints { make in }
         
         messageImageView.contentMode = .scaleAspectFill
         
-        messageLabel.snp.makeConstraints { make in
-//            make.edges.equalToSuperview().inset(12)
-        }
+        messageLabel.snp.makeConstraints { make in }
         
         bubbleView.snp.makeConstraints { make in
             make.bottom.equalToSuperview().offset(-8)

@@ -122,7 +122,24 @@ class SentimentAnalysisChatController: UIViewController, UIImagePickerController
     }
     
     @objc private func keyboardWillHide(notification: Notification) {
-
+        guard let userInfo = notification.userInfo,
+              let animationDuration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
+              let animationCurve = userInfo[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt else {
+            return
+        }
+        
+        // Reset the bottom constraint to its original value (typically 0 or whatever you need)
+        containerBottomConstraint?.update(offset: 0) // or your original offset if different
+        
+        UIView.animate(
+            withDuration: animationDuration,
+            delay: 0,
+            options: UIView.AnimationOptions(rawValue: animationCurve << 16),
+            animations: {
+                self.view.layoutIfNeeded()
+            },
+            completion: nil
+        )
     }
     
     @objc private func openImagePicker() {
