@@ -26,13 +26,24 @@ class APIHelper: NSObject {
               switch response.result {
               case .success(let data):
                   if let data = data {
+                      
                       let json = JSON(data)
-                      let label =  json["label"].string!
-                      let score =  json["score"].double!
+                      
+                      guard let label = json["label"].string,
+                            let score = json["score"].double else {
+                          
+                          completion(MessageModel(text: "Server invalid response", isFromServer: true))
+                          
+                          return
+                          
+                      }
+
                       completion(MessageModel(text: "\(label) \(score.trimmedToTwoDecimalPlaces())", isFromServer: true))
+                      
                   }
               case .failure(let error):
                   print("error - \(error.localizedDescription)")
+                  completion(MessageModel(text: error.localizedDescription, isFromServer: true))
               }
         }
     }
@@ -41,7 +52,6 @@ class APIHelper: NSObject {
         
         guard let imageData = image.jpegData(compressionQuality: 0.5) else {
             print("Could not convert UIImage to Data")
-            fail()
             return
         }
         
@@ -57,14 +67,24 @@ class APIHelper: NSObject {
             switch response.result {
             case .success(let data):
                 if let data = data {
+                    
                     let json = JSON(data)
-                    let label =  json["predictions"][0]["label"].string!
-                    let score =  json["predictions"][0]["probability"].double!
+                    
+                    guard let label = json["predictions"][0]["label"].string,
+                          let score = json["predictions"][0]["probability"].double else {
+                        
+                        completion(MessageModel(text: "Server invalid response", isFromServer: true))
+                        
+                        return
+                        
+                    }
+                    
                     completion(MessageModel(text: "\(label) \(score.trimmedToTwoDecimalPlaces())", isFromServer: true))
+                    
                 }
             case .failure(let error):
                 print("error - \(error.localizedDescription)")
-                fail()
+                completion(MessageModel(text: error.localizedDescription, isFromServer: true))
             }
         }
         
