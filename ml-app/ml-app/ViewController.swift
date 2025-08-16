@@ -27,7 +27,7 @@ class ViewController: UIViewController {
         self.addChild(nav)
         self.view.addSubview(nav.view)
         
-        nav.viewControllers = [SentimentAnalysisChatController()]
+        nav.viewControllers = [LaunchViewController()]
         
     }
 

@@ -23,6 +23,8 @@ class SentimentAnalysisChatController: UIViewController, UIImagePickerController
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.view.backgroundColor = .white
+        
         addButton.setImage(UIImage(systemName: "plus"), for: .normal)
         addButton.tintColor = .systemBlue
         addButton.addTarget(self, action: #selector(openImagePicker), for: .touchUpInside)
