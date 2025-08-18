@@ -27,6 +27,8 @@ class ViewController: UIViewController {
         self.addChild(nav)
         self.view.addSubview(nav.view)
         
+        nav.interactivePopGestureRecognizer?.delegate = nil
+        
         nav.viewControllers = [LaunchViewController()]
         
     }

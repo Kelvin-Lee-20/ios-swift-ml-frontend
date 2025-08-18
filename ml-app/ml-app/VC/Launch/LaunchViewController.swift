@@ -11,6 +11,8 @@ import SnapKit
 
 class LaunchViewController: UIViewController {
     
+    var isAnimationCompleted = false
+    
     private let l1: UILabel = {
         let label = UILabel()
         label.text = "Kelvin Lee"
@@ -108,7 +110,9 @@ class LaunchViewController: UIViewController {
                               
                               // ViewController.me.nav.viewControllers = [SentimentAnalysisChatController()]
                               
-                              ViewController.me.nav.pushViewController(SentimentAnalysisChatController(), animated: true)
+                              ViewController.me.nav.pushViewController(HomeViewController(), animated: true)
+                              
+                              self.isAnimationCompleted = true
                               
                           }
                           
@@ -119,11 +123,17 @@ class LaunchViewController: UIViewController {
              }
 
          }
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(onTap))
+        view.addGestureRecognizer(tapGesture)
+        view.isUserInteractionEnabled = true
 
     }
     
     @objc func onTap(_ sender: UITapGestureRecognizer) {
-
+        if (isAnimationCompleted) {
+            ViewController.me.nav.pushViewController(HomeViewController(), animated: true)
+        }
     }
 
     override func didReceiveMemoryWarning() {
